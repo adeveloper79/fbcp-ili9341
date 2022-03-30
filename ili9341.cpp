@@ -61,6 +61,7 @@ void InitILI9341()
 #ifdef DISPLAY_ROTATE_180_DEGREES
     madctl ^= MADCTL_ROTATE_180_DEGREES;
 #endif
+    madctl |= MADCTL_COLUMN_ADDRESS_ORDER_SWAP;
     SPI_TRANSFER(0x36/*MADCTL: Memory Access Control*/, madctl);
 
 #ifdef DISPLAY_INVERT_COLORS

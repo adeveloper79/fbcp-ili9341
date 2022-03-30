@@ -139,6 +139,16 @@ int main()
   int frameParity = 0; // For interlaced frame updates, this is either 0 or 1 to denote evens or odds.
   OpenKeyboard();
   printf("All initialized, now running main loop...\n");
+  uint64_t t0 = tick();
+  usleep(2000);
+  uint64_t t1 = tick();
+  printf("%lu\n", t1 - t0);
+  printf("%x %x %x %x %x %x %x %x\n", systemTimerRegister->cs, systemTimerRegister->clo, systemTimerRegister->chi,
+         systemTimerRegister->c[0], systemTimerRegister->c[1],systemTimerRegister->c[2],systemTimerRegister->c[3]
+  );
+  printf("%x %x %x %x %x %x %x %x\n", systemTimerRegister->cs, systemTimerRegister->clo, systemTimerRegister->chi,
+         systemTimerRegister->c[0], systemTimerRegister->c[1],systemTimerRegister->c[2],systemTimerRegister->c[3]
+  );
   while(programRunning)
   {
     prevFrameWasInterlacedUpdate = interlacedUpdate;

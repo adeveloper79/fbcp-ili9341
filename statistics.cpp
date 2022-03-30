@@ -126,6 +126,7 @@ void DrawStatisticsOverlay(uint16_t *framebuffer)
 #define FRAMERATE_GRAPH_MAX_Y (gpuFrameHeight - 10)
 #define AT(x,y) ((y)*(gpuFramebufferScanlineStrideBytes>>1)+(x))
 #endif
+#if 0
   for(int i = 0; i < MIN(statsFrameIntervalsSize, FRAMERATE_GRAPH_WIDTH); ++i)
   {
     int x = FRAMERATE_GRAPH_WIDTH-1-i;
@@ -148,6 +149,7 @@ void DrawStatisticsOverlay(uint16_t *framebuffer)
     framebuffer[AT(x, FRAMERATE_GRAPH_MAX_Y-1)] = RGB565(0,0,0);
     framebuffer[AT(x, FRAMERATE_GRAPH_MAX_Y)] = RGB565(15,30,15);
   }
+#endif
 #endif
 }
 

@@ -526,7 +526,11 @@ int InitSPI()
   if (bcm2835 == MAP_FAILED) FATAL_ERROR("mapping /dev/mem failed");
   spi = (volatile SPIRegisterFile*)((uintptr_t)bcm2835 + BCM2835_SPI0_BASE);
   gpio = (volatile GPIORegisterFile*)((uintptr_t)bcm2835 + BCM2835_GPIO_BASE);
+#ifdef TIMER_32BIT
+  systemTimerRegister = (volatile TIMER_TYPE*)((uintptr_t)bcm2835 + BCM2835_TIMER_BASE);
+#else
   systemTimerRegister = (volatile TIMER_TYPE*)((uintptr_t)bcm2835 + BCM2835_TIMER_BASE + 0x04); // Generates an unaligned 64-bit pointer, but seems to be fine.
+#endif
   // TODO: On graceful shutdown, (ctrl-c signal?) close(mem_fd)
 #endif
 
