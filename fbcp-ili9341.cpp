@@ -2,6 +2,8 @@
 #include <linux/fb.h>
 #include <linux/futex.h>
 #include <linux/spi/spidev.h>
+#include <unistd.h>
+#include <sys/un.h>
 #include <memory.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,6 +17,9 @@
 #include <inttypes.h>
 #include <math.h>
 #include <signal.h>
+#include <cerrno>
+#include <pthread.h> // pthread_create
+#include <sys/stat.h>
 
 #include "config.h"
 #include "text.h"
@@ -63,6 +68,56 @@ const char *SignalToString(int signal)
 void MarkProgramQuitting()
 {
   programRunning = false;
+}
+
+volatile bool drawStatistics = true;
+pthread_t drawStatThread;
+const char* socketFileName = "/var/run/fbcp_statistics";
+
+void *stat_switch_thread(void *unused) {
+  int len;
+  char buff[24];
+  struct timeval tv;
+  while (programRunning) {
+    int fd = open(socketFileName, O_RDONLY);
+    if (fd < 0) {
+      printf("open pipe failed %d %s \n", errno, strerror(errno));
+      return NULL;
+    }
+    int n = read(fd, buff, 16);
+    for (n --; n >= 0 ; n --) {
+      if (buff[n] == '1') {
+        drawStatistics = true;
+        break;
+      } else if (buff[n] == '0') {
+        drawStatistics = false;
+        break;
+      }
+    }
+    close(fd);
+  }
+}
+
+void InitDrawStatisticsSwitch() {
+  unlink(socketFileName);
+  int old = umask(0);
+  int ret = mkfifo(socketFileName, 0666);
+  umask(old);
+  if (ret < 0) {
+    printf("mkfifo failed %d %d %s \n", ret, errno, strerror(errno));
+    return;
+  }
+  pthread_create(&drawStatThread, NULL, stat_switch_thread, NULL);
+}
+
+void DeInitDrawStatisticsSwitch() {
+  int fd = open(socketFileName, O_WRONLY);
+  if (fd > 0) {
+    write(fd, "-", 1);
+  }
+  close(fd);
+  pthread_join(drawStatThread, NULL);
+  drawStatThread = (pthread_t)0;
 }
 
 void ProgramInterruptHandler(int signal)
@@ -138,17 +193,8 @@ int main()
   bool interlacedUpdate = false; // True if the previous update we did was an interlaced half field update.
   int frameParity = 0; // For interlaced frame updates, this is either 0 or 1 to denote evens or odds.
   OpenKeyboard();
+  InitDrawStatisticsSwitch();
   printf("All initialized, now running main loop...\n");
-  uint64_t t0 = tick();
-  usleep(2000);
-  uint64_t t1 = tick();
-  printf("%lu\n", t1 - t0);
-  printf("%x %x %x %x %x %x %x %x\n", systemTimerRegister->cs, systemTimerRegister->clo, systemTimerRegister->chi,
-         systemTimerRegister->c[0], systemTimerRegister->c[1],systemTimerRegister->c[2],systemTimerRegister->c[3]
-  );
-  printf("%x %x %x %x %x %x %x %x\n", systemTimerRegister->cs, systemTimerRegister->clo, systemTimerRegister->chi,
-         systemTimerRegister->c[0], systemTimerRegister->c[1],systemTimerRegister->c[2],systemTimerRegister->c[3]
-  );
   while(programRunning)
   {
     prevFrameWasInterlacedUpdate = interlacedUpdate;
@@ -286,7 +332,9 @@ int main()
 #endif
       __atomic_fetch_sub(&numNewGpuFrames, numNewFrames, __ATOMIC_SEQ_CST);
 
-      DrawStatisticsOverlay(framebuffer[0]);
+      if (drawStatistics) {
+        DrawStatisticsOverlay(framebuffer[0]);
+      }
       DrawLowBatteryIcon(framebuffer[0]);
 
 #ifdef USE_GPU_VSYNC
@@ -581,6 +629,7 @@ int main()
 #endif
   }
 
+  DeInitDrawStatisticsSwitch();
   DeinitGPU();
   DeinitSPI();
   CloseMailbox();
