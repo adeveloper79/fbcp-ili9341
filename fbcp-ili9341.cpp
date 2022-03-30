@@ -70,7 +70,7 @@ void MarkProgramQuitting()
   programRunning = false;
 }
 
-volatile bool drawStatistics = true;
+volatile bool drawStatistics = false;
 pthread_t drawStatThread;
 const char* socketFileName = "/var/run/fbcp_statistics";
 
