@@ -96,6 +96,7 @@ void *stat_switch_thread(void *unused) {
     }
     close(fd);
   }
+  return NULL;
 }
 
 void InitDrawStatisticsSwitch() {
