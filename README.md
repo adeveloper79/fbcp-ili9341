@@ -225,7 +225,7 @@ Alternatively, instead of modifying `/etc/rc.local`, use the provided `systemd` 
 sudo install -m 0644 -t /etc fbcp-ili9341.conf 
 sudo install -m 0644 -t /etc/systemd/system fbcp-ili9341.service 
 sudo systemctl daemon-reload
-sudo systemctl enable fbcp && sudo systemctl start fbcp
+sudo systemctl enable fbcp-ili9341 && sudo systemctl start fbcp-ili9341
 ```
 
 ##### Configuring HDMI and TFT display sizes
