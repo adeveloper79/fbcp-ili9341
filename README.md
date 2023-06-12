@@ -160,6 +160,7 @@ There are a couple of options to explicitly say which Pi board you want to targe
 - `-DARMV6Z=ON`: Pass this option to specifically optimize for ARMv6Z instruction set (Pi 1A, 1A+, 1B, 1B+, Zero, Zero W). If not present, autodetected.
 - `-DARMV7A=ON`: Pass this option to specifically optimize for ARMv7-A instruction set (Pi 2B < rev 1.2). If not present, autodetected.
 - `-DARMV8A=ON`: Pass this option to specifically optimize for ARMv8-A instruction set (Pi 2B >= rev. 1.2, 3B, 3B+, CM3, CM3 lite, 4B, CM4, Pi400). If not present, autodetected.
+- `-DAARCH64=YES`: Pass this option to build 64Bit compatible binary [#261](https://github.com/juj/fbcp-ili9341/pull/261)
 
 ###### Specifying other build options
 
