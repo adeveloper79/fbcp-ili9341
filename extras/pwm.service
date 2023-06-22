@@ -1,0 +1,11 @@
+[Unit]
+Description=PWM Service
+After=network.target
+
+[Service]
+ExecStart=python /path/to/pwm.py --pwm_value 50
+StandardOutput=null
+
+[Install]
+WantedBy=multi-user.target
+
