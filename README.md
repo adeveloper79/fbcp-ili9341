@@ -228,6 +228,14 @@ sudo install -m 0644 -t /etc/systemd/system fbcp-ili9341.service
 sudo systemctl daemon-reload
 sudo systemctl enable fbcp-ili9341 && sudo systemctl start fbcp-ili9341
 ```
+##### For Brightness with `systemd`
+```
+sudo install -m 0644 -t /etc/systemd/system extras/pwm.service 
+sudo install -m 0644 -t /etc/systemd/system extras/brightness-toggle.service
+sudo systemctl daemon-reload
+sudo systemctl enable pwm && sudo systemctl start pwm
+sudo systemctl enable brightness-toggle && sudo systemctl start brightness-toggle
+```
 
 ##### Configuring HDMI and TFT display sizes
 
