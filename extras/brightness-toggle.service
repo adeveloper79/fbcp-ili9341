@@ -1,0 +1,13 @@
+[Unit]
+Description=Brightness Toggle Service
+After=network.target
+
+[Service]
+ExecStart=python /path/to/brightness-toggle.py
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=brightness-toggle
+
+[Install]
+WantedBy=multi-user.target
+
